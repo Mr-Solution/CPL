@@ -1,6 +1,7 @@
 /*************************************************************************
 	> File Name: lstack.c
-	> Author: reeves
+	> Description: linked stack
+    > Author: reeves
 	> Mail: seereeves@163.com 
 	> Created Time: 2018年07月09日 星期一 20时51分06秒
  ************************************************************************/

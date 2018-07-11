@@ -1,6 +1,6 @@
 /*************************************************************************
 	> File Name: sqstack.h
-	> Description: stack sequence
+	> Description: linera stack
     > Author: reeves
 	> Mail: seereeves@163.com 
 	> Created Time: 2018年07月09日 星期一 15时47分15秒
