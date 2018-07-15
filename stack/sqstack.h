@@ -1,7 +1,7 @@
 /*************************************************************************
 	> File Name: sqstack.h
-	> Description: linera stack
-    > Author: reeves
+	> Description: linear stack
+    > Author: libo
 	> Mail: seereeves@163.com 
 	> Created Time: 2018年07月09日 星期一 15时47分15秒
  ************************************************************************/
@@ -11,12 +11,11 @@
 
 #define EmptyTOP -1
 
-typedef int ElemType;  //存储单元的数据类型
+typedef float ElemType;  //存储单元的数据类型
 
 typedef struct stack {
-    int length;            //当前长度
     int size;              //栈的大小
-    int top;               //栈顶指针
+    int top;               //栈顶,指向栈顶元素的index（0- ）
     ElemType *array;       //存放数据的数组
 } STACK;
 /*
@@ -45,13 +44,23 @@ void push(STACK *s, ElemType elem);
 ElemType pop(STACK *s);
 
 /*
+ * 清空栈的内容
+ * */
+void clear(STACK *sk);
+
+/*
  * 释放一个栈
  * */
 void dispose_stack(STACK *s);
 
 /*
- * 扩展顺序栈的大小为size*sizeof(ElemType)
+ * 扩展顺序栈的大小
  * */
 int expand_stack(STACK *s);
+
+/*
+ * 获取栈的大小
+ * */
+int stack_size(STACK *s);
 
 #endif
