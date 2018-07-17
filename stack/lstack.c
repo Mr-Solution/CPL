@@ -1,6 +1,7 @@
 /*************************************************************************
 	> File Name: lstack.c
-	> Author: reeves
+	> Description: linked stack
+    > Author: libo
 	> Mail: seereeves@163.com 
 	> Created Time: 2018年07月09日 星期一 20时51分06秒
  ************************************************************************/
@@ -9,18 +10,13 @@
 #include <stdlib.h>
 #include "lstack.h"
 
-#define MAXLEN 1000
-
-STACK *creat_stack(int maxElem) {
-    if (maxElem > MAXLEN) {
-        printf("The size of stack is limited to %d\n", MAXLEN);
-        return NULL;
-    }
+STACK *creat_stack() {
     STACK *sk;
     sk = (STACK *)malloc(sizeof(STACK));
-    sk->size = maxElem;
-    sk->len = 0;
-
+    if (NULL == sk) {
+        printf("Memory allocation failure.\n");
+        exit(-1);
+    }
     sk->bottom = (lnode *)malloc(sizeof(lnode));
     if (NULL == sk->bottom) {
         printf("Memory allocation failure.\n");
@@ -29,31 +25,33 @@ STACK *creat_stack(int maxElem) {
     sk->bottom->val = 0;
     sk->bottom->next = NULL;
     sk->top = sk->bottom;
+    sk->size = 0;
     return sk;
+}
+
+int size(STACK *s) {
+    if (s != NULL) {
+        return s->size;
+    }
+    else {
+        return 0;
+    }
 }
 
 int isEmpty(STACK *s) {
     return s->top == s->bottom ? 1:0;
 }
 
-int isFull(STACK *s) {
-    return s->len == s->size ? 1:0;
-}
-
 void push(STACK *s, ElemType elem) {
-    if (isFull(s)) {
-        printf("The stack is full\n");
+    lnode *p = (lnode *)malloc(sizeof(lnode));
+    if (NULL == p) {
+        printf("Memory allocation failure.\n");
+        exit(-1);
     }
-    else {
-        lnode *p = (lnode *)malloc(sizeof(lnode));
-        if (NULL == p) {
-            printf("Memory allocation failure.\n");
-            exit(-1);
-        }
-        p->val = elem;
-        p->next = s->top;
-        s->top = p;
-    }
+    p->val = elem;
+    p->next = s->top;
+    s->top = p;
+    ++s->size;
 }
 
 int pop(STACK *s, ElemType *val) {
@@ -66,20 +64,21 @@ int pop(STACK *s, ElemType *val) {
     s->top = s->top->next;
     free(p);
     p = NULL;
+    --s->size;
     return 0;
 }
 
 void dispose_stack(STACK *s) {
-    if (isEmpty(s)) {
+    if (NULL == s)
         return;
+    
+    lnode *p = NULL;
+    while (!isEmpty(s)) {
+        p = s->top;
+        s->top = s->top->next;
+        free(p);
+        p = NULL;
     }
-    else {
-        lnode *p = NULL;
-        while (s->top != s->bottom) {
-            p = s->top;
-            s->top = s->top->next;
-            free(p);
-            p = NULL;
-        }
-    }
+    free(s);
+    s=NULL;
 }
