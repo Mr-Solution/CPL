@@ -41,7 +41,7 @@ void *assign_value(void *dest, const void *val, size_t size) {
     return dest;
 }
 
-void push(STACK *sk, void *val, size_t size) {
+void push(STACK *sk, void *val) {
     if (isFull(sk)) {
         int ret = expand_stack(sk);
         if (-1 == ret) {
@@ -51,7 +51,7 @@ void push(STACK *sk, void *val, size_t size) {
     }
     sk->top++;  //栈顶加1
     sk->free--;
-    assign_value(sk->array + (sk->top * sk->size), val, size);
+    assign_value(sk->array + (sk->top * sk->size), val, sk->size);
 }
 
 void *pop(STACK *sk/*, size_t *size*/) {

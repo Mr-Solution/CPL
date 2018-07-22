@@ -26,7 +26,7 @@ int infixToPostfix(char *infixExpression, char postfixExpression[]) {
         else if ((isEmpty(sk) && *infixExpression != ')')
                 || '(' == *infixExpression 
                 || '(' == *(char *)stack_top(sk)) {
-            push(sk, infixExpression, sizeof(char));
+            push(sk, infixExpression);
             ++infixExpression;
         }
         else if (')' == *infixExpression){
@@ -50,7 +50,7 @@ int infixToPostfix(char *infixExpression, char postfixExpression[]) {
                 postfixExpression[index++] = ' ';
                 top = *(char *)stack_top(sk);
             }
-            push(sk, infixExpression, sizeof(char));
+            push(sk, infixExpression);
             ++infixExpression;
         }
     }
@@ -77,7 +77,7 @@ int computeValueFromPostfix(char *postfixExpression, double *value) {
                 sum = sum * 10 + *postfixExpression - '0';
                 ++postfixExpression;
             }
-            push(sk, &sum, sizeof(double));
+            push(sk, &sum);
         }
         else if (' ' == *postfixExpression) {
             ++postfixExpression;
@@ -104,7 +104,7 @@ int computeValueFromPostfix(char *postfixExpression, double *value) {
                 default:
                     res = 1;
             }
-            push(sk, &res, sizeof(double));
+            push(sk, &res);
             ++postfixExpression;
         }
     }

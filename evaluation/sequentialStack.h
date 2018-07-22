@@ -40,7 +40,7 @@ void *assign_value(void *dest, const void *val, size_t size);
 /*
  * 入栈
  * */
-void push(STACK *s, void *val, size_t size);
+void push(STACK *s, void *val);
 
 /*
  * 出栈
