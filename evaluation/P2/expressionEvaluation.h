@@ -15,17 +15,17 @@ int infixToPostfix(char *infixExpression, char postfixExpression[]);
 int computeValueFromPostfix(char *postfixExpression, double *value);
 
 /*
- * 去掉数字和字符之间的空格
+ * 格式化字符串s，去空格，负数变为0减正数，正数去+
  * */
-int strip(char *s);
+int format(char *s);
 /*
  * 是否是运算符：+ - * /
  * */
 int isoperator(char c);
 /*
- * 是否是操作数,数字和小数点
+ * 从s中提取操作数(数字和小数点)到t中
  * */
-int isoperand(char c);
+int extract_operand(char *s, char *t);
 /*
  * 判断字符是否合法
  * */
