@@ -15,7 +15,7 @@ int infixToPostfix(char *infixExpression, char postfixExpression[]);
 int computeValueFromPostfix(char *postfixExpression, double *value);
 
 /*
- * 格式化字符串s，去空格，负数变为0减正数，正数去+
+ * 格式化字符串s，去掉空格
  * */
 int format(char *s);
 /*
@@ -23,7 +23,8 @@ int format(char *s);
  * */
 int isoperator(char c);
 /*
- * 从s中提取操作数(数字和小数点)到t中
+ * 暂未使用的接口
+ * 从s中提取操作数(数字,正负号和小数点)到t中
  * */
 int extract_operand(char *s, char *t);
 /*

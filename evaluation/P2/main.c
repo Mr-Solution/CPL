@@ -66,7 +66,7 @@ int main(int argc, const char * argv[]) {
             printf("Sorry, we can't evaluate such a postfix expression.");
         }
         else{
-            printf("Sorry, we can't turn such an infix expressin to a postfix expression.");
+            printf("Sorry, we can't turn such an infix expressin to a postfix expression.\n");
         }
         printf("----------------------------------------------------------------\n\n");
     }
