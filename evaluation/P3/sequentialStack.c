@@ -10,7 +10,7 @@
 #define StackLen(s) s->top+1
 // test of validity, without return value
 #define CHECKPOINTERVOID(pointer) do { \
-    if(NULL==pointer) {\
+    if (NULL==pointer) {\
         printf("err! illegal parameter, the pointer is NULL.\n"); \
         return ; \
     } \
@@ -18,7 +18,7 @@
 
 // test of validity
 #define CHECKPOINTER(pointer) do { \
-    if(NULL==pointer) {\
+    if (NULL==pointer) {\
         printf("err! illegal parameter, the pointer is NULL.\n"); \
         return 0; \
     } \
@@ -45,7 +45,7 @@ void DestroyStack(SqStack *s) {
 int StackEmpty(SqStack *s) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
-        printf("The stack is empty\n");
+        //printf("The stack is empty.\n");
         return 1;
     }
     else {
@@ -113,7 +113,6 @@ void display(SqStack *s) {
     }
 }
 
-
 /* Interfaces for the 2nd stack for double elements*/
 
 /*  Initialize the sequential stack
@@ -137,7 +136,7 @@ void DestroyStack1(SqStack1 *s) {
 int StackEmpty1(SqStack1 *s) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
-        printf("The stack is empty\n");
+        //printf("The stack is empty.\n");
         return 1;
     }
     else {
