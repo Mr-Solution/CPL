@@ -29,6 +29,7 @@ int isBinaryOperator(char c);
 int islegal(char c);
 int priority(char c);
 /*
+ * This function will check whether the character is legal and 
  * Split the infixExpression into a series of separate elements: 
  * such as operands, binary operators, unary operators, etc.
  * different elements are separated by a space
@@ -48,23 +49,19 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
     InitStack(sk);
     char topch;
     int index = 0;
-    int priortype;        // the type of the prior character
-    char priorch = '0';   // the value of the prior character
+    // int priortype;        // the type of the prior character
+    // char priorch = '0';   // the value of the prior character
+    // we don't do the legitimacy checking
+    // because it has been done in the splitExpression function
     while (*infixExpression != '\0') {
-        // legitimacy checking
-        // if (!islegal(*infixExpression)) {
-        //     printf("err! Illegal character: %c.\n", *infixExpression);
-        //     DESTROYSTACK(sk);
-        //     return 0;
-        // }
         // append the operands to the postfixExpression immediately
         if (isdigit(*infixExpression)) {
-            if (DIGIT == priortype) {
-                printf("err! There is an illegal space between operands %c and %c.\n", priorch,*infixExpression);
-                return 0;
-            }
-            priortype = DIGIT;
-            priorch = *infixExpression;
+            // if (DIGIT == priortype) {
+            //     printf("err! There is an illegal space between operands %c and %c.\n", priorch,*infixExpression);
+            //     return 0;
+            // }
+            // priortype = DIGIT;
+            // priorch = *infixExpression;
             while (isdigit(*infixExpression)) {
                 postfixExpression[index++] = *infixExpression;
                 ++infixExpression;
@@ -73,7 +70,7 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
         }
         // pop out the element until the top of the stack is '('
         else if (')' == *infixExpression) {
-            priortype = BRACES;
+            // priortype = BRACES;
             while (!StackEmpty(sk)) {
                 if (Pop(sk, &topch)) {
                     if ('(' == topch) {
@@ -91,8 +88,8 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
         }
         // push the '(' into the stack immediately
         else if ('(' == *infixExpression) {
-            priortype = BRACES;
-            priorch = *infixExpression;
+            // priortype = BRACES;
+            // priorch = *infixExpression;
             if (!Push(sk, *infixExpression)) {
                 printf("err! Push failed.\n");
                 return 0;
@@ -101,20 +98,20 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
         }
         // process the operators
         else if (isBinaryOperator(*infixExpression) || isUnaryOperator(*infixExpression)) {
-            if (BINARYOPERATOR == priortype) {
-                printf("err! There are two successive operators %c%c.\n",priorch, *infixExpression);
-                return 0;
-            }
-            priortype = BINARYOPERATOR;
-            if ( '-' == *infixExpression
-                && ('(' == priorch || '0' == priorch) ) {
-                *infixExpression = '$';
-            }
-            if ( '+' == *infixExpression
-                && ('(' == priorch || '0' == priorch) ) {
-                *infixExpression = '@';
-            }
-            priorch = *infixExpression;
+            // if (BINARYOPERATOR == priortype) {
+            //     printf("err! There are two successive operators %c%c.\n",priorch, *infixExpression);
+            //     return 0;
+            // }
+            // priortype = BINARYOPERATOR;
+            // if ( '-' == *infixExpression
+            //     && ('(' == priorch || '0' == priorch) ) {
+            //     *infixExpression = '$';
+            // }
+            // if ( '+' == *infixExpression
+            //     && ('(' == priorch || '0' == priorch) ) {
+            //     *infixExpression = '@';
+            // }
+            // priorch = *infixExpression;
             if (StackEmpty(sk)) {
                 Push(sk, *infixExpression);
             }
@@ -305,95 +302,96 @@ int splitExpression(char *s) {
             printf("err! split found Illegal character: %c.\n", s[i]);
             return 0;
         }
-        if (isspace(s[i])) {
-            // Skip the spaces in the original string. 
-            ;
+        if (isdigit(s[i])) {  // Backward traversal 
+            int spacesNum = 0;
+            for (int j=i; j<len; ++j) {
+                if (!islegal(s[j])) {
+                    printf("err! split found Illegal character: %c.\n", s[j]);
+                    return 0;
+                }
+                if (isBinaryOperator(s[j]) || ')' == s[j]) {
+                    break;  // We expect an operator or a ')' behind the operand
+                }
+                if (isspace(s[j])) {
+                    ++spacesNum;
+                    continue;
+                }
+                if (isdigit(s[j])) {
+                    if (spacesNum > 0) {
+                        printf("err! There is an illegal space between operands %c and %c.\n",s[i], s[j]);
+                        return 0;
+                    }
+                }
+                if ('(' == s[j]) {
+                    printf("err! An operator is required before the %d-th character '('.\n", i+j);
+                    return 0;
+                }
+            }
+            tmp[itr++] = s[i];
         }
-        else {
-            if (isdigit(s[i])) {
-                int spacesNum = 0;
-                for (int j=i; j<len; ++j) {
+        else if (isBinaryOperator(s[i])) {
+            if (0 == i) {
+                if ('-' == s[i]) 
+                    s[i] = '$';
+                else if ('+' == s[i]) 
+                    s[i] = '@';
+            }
+            else { // i>0
+                for (int j=i+1; j<len; ++j) { // Backward traversal 
                     if (!islegal(s[j])) {
                         printf("err! split found Illegal character: %c.\n", s[j]);
                         return 0;
                     }
+                    if ('(' == s[j] || isdigit(s[j])) {
+                        break;  // We expect a '(' or a digit behind the operator
+                    }
                     if (isBinaryOperator(s[j])) {
+                        printf("err! There are two successive operators %c %c.\n",s[i], s[j]);
+                        return 0;
+                    }
+                    if (len-1 == j) {
+                        printf("err! An operand is required after the operator %c.\n", s[i]);
+                        return 0;
+                    }
+                }
+                for (int j=i-1; j>=0; --j) {  // Forward traversal
+                    if (!islegal(s[j])) {
+                        printf("err! split found Illegal character: %c.\n", s[j]);
+                        return 0;
+                    }
+                    if (')' == s[j] || isdigit(s[j])) {
                         break;
                     }
-                    if (isspace(s[j])) {
-                        ++spacesNum;
-                        continue;
-                    }
-                    if (isdigit(s[j]) && spacesNum > 0) {
-                        printf("err! There is an illegal space between operands %c and %c.\n",s[i], s[j]);
+                    if (isBinaryOperator(s[j])) {
+                        printf("err! There are two successive operators %c %c.\n",s[j], s[i]);
                         return 0;
                     }
-                    if ('(' == s[j]) {
-                        printf("err! An operator is required before the %d-th character '('.\n", i+j);
+                    if ('(' == s[j] || 0 == j) {
+                        if ('-' == s[i]) 
+                            s[i] = '$';
+                        else if ('+' == s[i]) 
+                            s[i] = '@';
+                        break;
                     }
                 }
             }
-            else if (isBinaryOperator(s[i])) {
-                if (0 == i) {
-                    if ('-' == s[i]) 
-                        s[i] = '$';
-                    else if ('+' == s[i]) 
-                        s[i] = '@';
+            if ('@' == s[i] || '$' == s[i]) {
+                if (len == i) {
+                    printf("err! An operand is required after the operator %c", s[i]);
+                    return 0;
                 }
-                else { // i>0
-                    for (int j=i+1; j<len; ++j) { // Backward traversal 
-                        if (!islegal(s[j])) {
-                            printf("err! split found Illegal character: %c.\n", s[j]);
-                            return 0;
-                        }
-                        if ('(' == s[j] || isdigit(s[j])) {
-                            break;
-                        }
-                        if (isBinaryOperator(s[j])) {
-                            printf("err! There are two successive operators %c %c.\n",s[i], s[j]);
-                            return 0;
-                        }
-                        if (len-1 == j) {
-                            printf("err! An operand is required after the operator %c", s[i]);
-                            return 0;
-                        }
-                    }
-                    for (int j=i-1; j>=0; --j) {  // Forward traversal
-                        if (!islegal(s[j])) {
-                            printf("err! split found Illegal character: %c.\n", s[j]);
-                            return 0;
-                        }
-                        if (')' == s[j] || isdigit(s[j])) {
-                            break;
-                        }
-                        if (isBinaryOperator(s[j])) {
-                            printf("err! There are two successive operators %c %c.\n",s[j], s[i]);
-                            return 0;
-                        }
-                        if ('(' == s[j] || 0 == j) {
-                            if ('-' == s[i]) 
-                                s[i] = '$';
-                            else if ('+' == s[i]) 
-                                s[i] = '@';
-                            break;
-                        }
-                    }
+                else if (!isdigit(s[i+1]) && '(' != s[i+1]) {
+                    printf("err! The sign and the digit should not be separated by spaces.\n");
+                    return 0;
                 }
-                if ('@' == s[i] || '$' == s[i]) {
-                    if (len == i) {
-                        printf("err! An operand is required after the operator %c", s[i]);
-                        return 0;
-                    }
-                    else if (!isdigit(s[i+1])) {
-                        printf("err! The sign and the digit should not be separated by spaces.\n");
-                        return 0;
-                    }
-                }
-            }
-            else {  // isspaces(s[i])
-                ;
             }
             tmp[itr++] = s[i];
+        }
+        else if ('(' == s[i] || ')' == s[i]) {
+            tmp[itr++] = s[i];
+        }
+        else {  // isspaces(s[i])
+            ;   // Skip the spaces in the original string. 
         }
     }
     tmp[itr++] = '\0';
