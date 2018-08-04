@@ -35,7 +35,6 @@ void DestroyStack(SqStack *s) {
     CHECKPOINTERVOID(s);
     s->top = -1;
     free(s);
-    //s = NULL;
 }
 
 /*  Check if the stack is empty.
@@ -45,7 +44,6 @@ void DestroyStack(SqStack *s) {
 int StackEmpty(SqStack *s) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
-        //printf("The stack is empty.\n");
         return 1;
     }
     else {
@@ -109,8 +107,9 @@ void display(SqStack *s) {
     CHECKPOINTERVOID(s);
     int cur_len = StackLen(s);
     for (int i=0; i<cur_len; ++i) {
-        printf("%c\n", s->data[i]);
+        printf("%c\t", s->data[i]);
     }
+    printf("\n");
 }
 
 /* Interfaces for the 2nd stack for double elements*/
@@ -136,7 +135,6 @@ void DestroyStack1(SqStack1 *s) {
 int StackEmpty1(SqStack1 *s) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
-        //printf("The stack is empty.\n");
         return 1;
     }
     else {
