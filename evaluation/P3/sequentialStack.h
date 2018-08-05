@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MaxSize 10
+#define MaxSize 30
 typedef char ElemType;
 typedef double ElemType1;
 

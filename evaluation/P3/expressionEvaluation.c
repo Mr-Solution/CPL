@@ -38,16 +38,15 @@ int isBinaryOperator(char c);
 int islegal(char c);
 int priority(char c);
 /*
- * This function will check whether the character is legal and 
- * Split the infixExpression into a series of separate elements: 
+ * This function will check whether the character is legal , 
+ * filter out the spaces, and identify different elements,
  * such as operands, binary operators, unary operators, etc. 
- * different elements are separated by a space
  * If everything is all right, RETURN 1; otherwise, RETURN 0 
 */ 
-int splitExpression(char *infixExpression);
+int expressionFilter(char *infixExpression);
 
 int infixToPostfix(char *infixExpression,char postfixExpression[]) {
-    if (!splitExpression(infixExpression)) {
+    if (!expressionFilter(infixExpression)) {
         return 0;
     }
     SqStack *sk = (SqStack *)malloc(sizeof(SqStack));
@@ -59,7 +58,7 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
     char topch;
     int index = 0;
     // we don't do the legitimacy checking
-    // because it has been done in the splitExpression function
+    // because it has been done in the expressionFilter function
     while (*infixExpression != '\0') {
         // append the operands to the postfixExpression immediately
         if (isdigit(*infixExpression)) {
@@ -283,20 +282,20 @@ int priority(char c) {
     return ret;
 }
 
-int splitExpression(char *s) {
+int expressionFilter(char *s) {
     char tmp[100];
     int len = strlen(s);
     int itr = 0;
     for (int i=0; i<len; ++i) {
         if (!islegal(s[i])) {
-            printf("err! Split found Illegal character: %c. \n", s[i]);
+            printf("err! Filter found illegal character: '%c'. \n", s[i]);
             return 0;
         }
         if (isdigit(s[i])) {  // Backward traversal 
             int spacesNum = 0;
             for (int j=i; j<len; ++j) {
                 if (!islegal(s[j])) {
-                    printf("err! split found Illegal character: %c.\n", s[j]);
+                    printf("err! Filter found Illegal character: '%c'.\n", s[j]);
                     return 0;
                 }
                 if (isBinaryOperator(s[j]) || ')' == s[j]) {
@@ -308,12 +307,12 @@ int splitExpression(char *s) {
                 }
                 if (isdigit(s[j])) {
                     if (spacesNum > 0) {
-                        printf("err! There is an illegal space between operands %c and %c.\n",s[i], s[j]);
+                        printf("err! There is an illegal space between operands '%c' and '%c'. \n",s[i], s[j]);
                         return 0;
                     }
                 }
                 if ('(' == s[j]) {
-                    printf("err! An operator is required before the %d-th character '('.\n", i+j);
+                    printf("err! An operator is required before the %d-th character '('.\n", j);
                     return 0;
                 }
             }
@@ -325,35 +324,26 @@ int splitExpression(char *s) {
                     s[i] = '$';
                 else if ('+' == s[i]) 
                     s[i] = '@';
+                else {
+                    printf("err! An operand is required before the first operator '%c'. \n",s[i]);
+                    return 0;
+                }
             }
             else { // i>0
-                for (int j=i+1; j<len; ++j) { // Backward traversal 
-                    if (!islegal(s[j])) {
-                        printf("err! split found Illegal character: %c.\n", s[j]);
-                        return 0;
-                    }
-                    if ('(' == s[j] || isdigit(s[j])) {
-                        break;  // We expect a '(' or a digit behind the operator
-                    }
-                    if (isBinaryOperator(s[j])) {
-                        printf("err! There are two successive operators %c %c.\n",s[i], s[j]);
-                        return 0;
-                    }
-                    if (len-1 == j) {
-                        printf("err! An operand is required after the operator %c.\n", s[i]);
-                        return 0;
-                    }
+                if (i == len-1) {
+                    printf("err! An operand is required after the %d-th character '%c'. \n",i,s[i]);
+                    return 0;
                 }
                 for (int j=i-1; j>=0; --j) {  // Forward traversal
                     if (!islegal(s[j])) {
-                        printf("err! split found Illegal character: %c.\n", s[j]);
+                        printf("err! Filter found illegal character: '%c'. \n", s[j]);
                         return 0;
                     }
                     if (')' == s[j] || isdigit(s[j])) {
                         break;
                     }
                     if (isBinaryOperator(s[j])) {
-                        printf("err! There are two successive operators %c %c.\n",s[j], s[i]);
+                        printf("err! There are two successive operators '%c %c'. \n",s[j], s[i]);
                         return 0;
                     }
                     if ('(' == s[j] || 0 == j) {
@@ -361,33 +351,71 @@ int splitExpression(char *s) {
                             s[i] = '$';
                         else if ('+' == s[i]) 
                             s[i] = '@';
+                        else {
+                            printf("err! An operand is required before the %d-th operator '%c'.\n", i,s[i]);
+                            return 0;
+                        }
                         break;
+                    }
+                }
+                for (int j=i+1; j<len; ++j) { // Backward traversal 
+                    if (!islegal(s[j])) {
+                        printf("err! Filter found Illegal character: '%c'.\n", s[j]);
+                        return 0;
+                    }
+                    if ('(' == s[j] || isdigit(s[j])) {
+                        break;  // We expect a '(' or a digit behind the operator
+                    }
+                    if (isBinaryOperator(s[j])) {
+                        printf("err! There are two successive operators '%c %c'. \n",s[i], s[j]);
+                        return 0;
+                    }
+                    if (len-1 == j) {
+                        printf("err! An operand is required after the %d-th character '%c'.\n", i, s[i]);
+                        return 0;
                     }
                 }
             }
             if ('@' == s[i] || '$' == s[i]) {
                 if (len == i) {
-                    printf("err! An operand is required after the operator %c", s[i]);
+                    printf("err! An operand is required after the operator '%c'. \n", s[i]);
                     return 0;
                 }
                 else if (!isdigit(s[i+1]) && '(' != s[i+1]) {
-                    printf("err! The sign and the digit should not be separated by space.\n");
+                    printf("err! The sign and the digit should not be separated by space. \n");
                     return 0;
                 }
             }
             tmp[itr++] = s[i];
         }
-        else if ('(' == s[i]) {
+        else if ('(' == s[i]) { // ) digit ( )
             if (itr > 0 && ')' == tmp[itr-1]) {
-                printf("err! An operator is expected between ')' and '('. \n");
+                printf("err! An operator is expected before the %d-th character '('. \n", i);
                 return 0;
             }
             tmp[itr++] = s[i];
         }
         else if (')' == s[i]) {
-            if (itr > 0 && '(' == tmp[itr-1]) {
+            if (0 == itr) {  // )
+                printf("err! The use of the first operator ')' is illegal. \n");
+                return 0;
+            }
+            if (itr > 0 && '(' == tmp[itr-1]) { // ( )
                 printf("err! Empty ( ). \n");
                 return 0;
+            }
+            for (int j=i+1; j<len; ++j) {
+                if (!islegal(s[j])) {
+                    printf("err! Filter found Illegal character: '%c'.\n", s[j]);
+                    return 0;
+                }
+                if (isBinaryOperator(s[j])) {
+                    break;
+                }
+                if (isdigit(s[j]) || '(' == s[j]) { // ) digit or ) (
+                    printf("err! An operator is required after the %d-th character '%c'. \n",i, s[i]);
+                    return 0;
+                }
             }
             tmp[itr++] = s[i];
         }
