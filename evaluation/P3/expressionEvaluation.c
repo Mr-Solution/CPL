@@ -22,6 +22,7 @@
 #define PUSH(STACK, ELEM) do { \
     if (!Push(STACK, ELEM)) { \
         printf("err! Push failed \n"); \
+        DESTROYSTACK(STACK); \
         return 0; \
     } \
 } while(0);
@@ -29,6 +30,7 @@
 #define PUSH1(STACK, ELEM) do { \
     if (!Push1(STACK, ELEM)) { \
         printf("err! Push1 failed \n"); \
+        DESTROYSTACK1(STACK); \
         return 0; \
     } \
 } while(0);
@@ -339,7 +341,7 @@ int expressionFilter(char *s) {
                 return 0;
             }
             if (isUnaryOperator(priorCH) && spacesNum > 0) {
-                printf("err! The sign and the digit should not be separated by space. \n");
+                printf("err! The operand and its sign should not be separated by space. \n");
                 return 0;
             }
             tmp[itr++] = s[i];
@@ -405,7 +407,7 @@ int expressionFilter(char *s) {
                 return 0;
             }
             if (isUnaryOperator(priorCH) && spacesNum > 0) {
-                printf("err! The sign and the digit should not be separated by space. \n");
+                printf("err! The operand and its sign should not be separated by space. \n");
                 return 0;
             }
             if (')' == priorCH) {
