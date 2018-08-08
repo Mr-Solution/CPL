@@ -44,7 +44,8 @@ int priority(char c);
  * if position == 0, return '\0'
  */
 char getpriorCH(char *s, int position, int step);
-
+char U2B(char unary);
+char B2U(char binary);
 /*
  * This function will check whether the character is legal , 
  * filter out the spaces, and identify different elements,
@@ -55,7 +56,7 @@ int expressionFilter(char *infixExpression);
 
 int infixToPostfix(char *infixExpression,char postfixExpression[]) {
     if (!expressionFilter(infixExpression)) {
-        printf("err! expression filter failed. \n");
+        // printf("err! expression filter failed. \n");
         return 0;
     }
     SqStack *sk = (SqStack *)malloc(sizeof(SqStack));
@@ -66,6 +67,7 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
     // There is no need to do the legitimacy checking, 
     // because it has been done in the expressionFilter function
     while (*infixExpression != '\0') {
+        topch = '\0';  // refresh the value of topch
         // append the operands to the postfixExpression immediately
         if (isdigit(*infixExpression)) {
             while (isdigit(*infixExpression)) {
@@ -88,7 +90,7 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
                 postfixExpression[index++] = topch;
             }
             if (topch != '(') {
-                printf("err! Improper braces, lack '('. \n");
+                printf("err! No matched '(' before ')'. \n");
                 DESTROYSTACK(sk);
                 return 0;
             }
@@ -137,7 +139,7 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
             return 0;
         }
         if ('(' == topch) {
-            printf("err! Improper braces, lack ')'. \n");
+            printf("err! No matched ')' after '('. \n");
             DESTROYSTACK(sk);
             return 0;
         }
@@ -189,7 +191,7 @@ int computeValueFromPostfix(char *postfixExpression, double *value) {
                     break;
                 case '/':
                     if (0 == b) {
-                        printf("err! ZERO DIVIDE! \n");
+                        printf("err! ZERO DIVISOR! \n");
                         return 0;
                     }
                     res = a/b;
@@ -310,6 +312,22 @@ char getpriorCH(char *s, int position, int step) {
     return priorCH;
 }
 
+char U2B(char unary) {
+    if ('@' == unary)
+        return '+';
+    if ('$' == unary)
+        return '-';
+    return unary;
+}
+
+char B2U(char binary) {
+    if ('+' == binary)
+        return '@';
+    if ('-' == binary) 
+        return '$';
+    return binary;
+}
+
 int expressionFilter(char *s) {
     char tmp[100];
     int len = strlen(s);
@@ -318,7 +336,7 @@ int expressionFilter(char *s) {
     char priorCH;
     for (int i=0; i<len; ++i) {
         if (!islegal(s[i])) {
-            printf("err! Filter found illegal character: '%c'. \n", s[i]);
+            printf("err! Illegal character '%c' in the expression. \n", s[i]);
             return 0;
         }
         if (isdigit(s[i])) {  
@@ -333,7 +351,7 @@ int expressionFilter(char *s) {
             */ 
             priorCH = getpriorCH(s, i, spacesNum);
             if (isdigit(priorCH) && spacesNum > 0) {
-                printf("err! There has a space between two digits. \n");
+                printf("err! No operator between two operands. \n");
                 return 0;
             }
             if (')' == priorCH) {
@@ -341,7 +359,10 @@ int expressionFilter(char *s) {
                 return 0;
             }
             if (isUnaryOperator(priorCH) && spacesNum > 0) {
-                printf("err! The operand and its sign should not be separated by space. \n");
+                if ('$' == priorCH)
+                    printf("err! A space follows a unary operator '-'. \n");
+                else
+                    printf("err! A space follows a unary operator '+'. \n");
                 return 0;
             }
             tmp[itr++] = s[i];
@@ -358,35 +379,35 @@ int expressionFilter(char *s) {
 
             // Both the binary operator and the unary operator are not allowed to locate in the last position
             if (i >= len-1) {
-                printf("err! An operand is required after the operator '%c'. \n", s[i]);
+                printf("err! No operand after the last operator '%c' in the expression. \n", s[i]);
                 return 0;
             }
             priorCH = getpriorCH(s, i, spacesNum);
             // Unary operator
             if ( '-' == s[i] || '+' == s[i]) {
                 if ( '\0' == priorCH || '(' == priorCH ) {
-                    if ('-' == s[i])
-                        s[i] = '$';
-                    else 
-                        s[i] = '@';
+                    s[i] = B2U(s[i]);
                     // s[i] is an unary operator
                 }
             }
             if (isBinaryOperator(s[i])) {
                 if ('\0' == priorCH) {
-                    printf("err! An operand is required before the operator '%c'. \n", s[i]);
+                    printf("err! No operand before the first operator '%c'. \n", s[i]);
                     return 0;
                 }
-                if (isBinaryOperator(priorCH) || isUnaryOperator(priorCH)) {
+                if (isBinaryOperator(priorCH)) {
                     printf("err! There are two successive operators '%c %c'. \n", priorCH, s[i]);
                     return 0;
                 }
+                if (isUnaryOperator(priorCH)) {
+                    printf("err! There are two successive operator '%c %c'. \n", U2B(priorCH), s[i]);
+                    return 0;
+                }
                 if ('(' == priorCH) {
-                    printf("err! An operand is required between '(' the operator '%c'. \n", s[i]);
+                    printf("err! No operand between '(' and '%c'. \n", s[i]);
                     return 0;
                 }
             }
-            
             tmp[itr++] = s[i];
             spacesNum = 0;
         }
@@ -403,15 +424,15 @@ int expressionFilter(char *s) {
             */
             priorCH = getpriorCH(s, i, spacesNum);
             if (isdigit(priorCH)) {
-                printf("err! An operator is required between '%c' and '%c'. \n", priorCH, s[i]);
+                printf("err! No operator between a digit '%c' and '('. \n", priorCH);
                 return 0;
             }
             if (isUnaryOperator(priorCH) && spacesNum > 0) {
-                printf("err! The operand and its sign should not be separated by space. \n");
+                printf("err! A space follows a unary operator '%c'. \n", U2B(priorCH));
                 return 0;
             }
             if (')' == priorCH) {
-                printf("err! An operator is required between '%c' and '%c'. \n", priorCH, s[i]);
+                printf("err! No operator between ')' and '('. \n");
                 return 0;
             }
             tmp[itr++] = s[i];
@@ -428,15 +449,19 @@ int expressionFilter(char *s) {
             */
             priorCH = getpriorCH(s, i, spacesNum);
             if ('(' == priorCH) {
-                printf("err! There is no content in the braces. \n");
+                printf("err! No operand between '(' and ')'. \n");
                 return 0;
             }
-            if (isBinaryOperator(priorCH) || isUnaryOperator(priorCH)) {
-                printf("err! An operand is required between the operator '%c' and ')'. \n", priorCH);
+            if (isBinaryOperator(priorCH)) {
+                printf("err! No operand between '%c' and ')'. \n", priorCH);
+                return 0;
+            }
+            if (isUnaryOperator(priorCH)) {
+                printf("err! No operand between '%c' and ')'. \n", U2B(priorCH));
                 return 0;
             }
             if ('\0' == priorCH) {
-                printf("err! Braces are not matched. \n");
+                printf("err! No matched '(' before ')'. \n");
                 return 0;
             }
             tmp[itr++] = s[i];
@@ -448,14 +473,18 @@ int expressionFilter(char *s) {
             ++spacesNum;
         }
     }
-    // priorCH is the last character
+    // priorCH is the last character that is not a space
     priorCH = getpriorCH(s, len, spacesNum);
-    if (isBinaryOperator(priorCH) || isUnaryOperator(priorCH)) {
-        printf("err! An operand is required after the operator '%c' \n", priorCH);
+    if (isBinaryOperator(priorCH)) {
+        printf("err! No operand after the last operator '%c' in the expression. \n", priorCH);
+        return 0;
+    }
+    if (isUnaryOperator(priorCH)) {
+        printf("err! No operand after the last operator '%c' in the expression. \n", U2B(priorCH));
         return 0;
     }
     if ('(' == priorCH) {
-        printf("err! Braces are not matched. \n");
+        printf("err! No matched ')' after '('. \n");
         return 0;
     }
     tmp[itr++] = '\0';
