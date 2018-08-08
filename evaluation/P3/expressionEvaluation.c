@@ -444,7 +444,7 @@ int expressionFilter(char *s) {
         }
         else {  
             // isspaces(s[i])
-            // This counter will be reset when s[i] is not a space. 
+            // The counter spacesNum will be reset when s[i] is not a space 
             ++spacesNum;
         }
     }
