@@ -8,188 +8,180 @@
 #include "sequentialStack.h"
 
 #define StackLen(s) s->top+1
-// test of validity, without return value
+/* test of validity, without return value */
 #define CHECKPOINTERVOID(pointer) do { \
     if (NULL==pointer) {\
         printf("err! illegal parameter, the pointer is NULL.\n"); \
         return ; \
     } \
 } while(0);
-
-// test of validity
+/* test of validity */
 #define CHECKPOINTER(pointer) do { \
     if (NULL==pointer) {\
         printf("err! illegal parameter, the pointer is NULL.\n"); \
-        return 0; \
+        return FAILED; \
     } \
 } while(0);
 
-void InitStack(SqStack *s) {
-    CHECKPOINTERVOID(s);
+State InitStack(SequentialStackChar *s) {
+    CHECKPOINTER(s);
     s->top = -1;
+    return SUCCEEDED;
 }
 
 /*  Release the memory of the sequential stack
  */
-void DestroyStack(SqStack *s) {
+void DestroyStack(SequentialStackChar *s) {
     CHECKPOINTERVOID(s);
     s->top = -1;
     free(s);
 }
 
 /*  Check if the stack is empty.
-    Return 1 to indicate the stack is empty.
-    Return 0 to indicate the stack is NOT empty.
+ *  Return SUCCEEDED to indicate the stack is empty.
+ *  Return FAILED to indicate the stack is NOT empty.
  */
-int StackEmpty(SqStack *s) {
+State StackEmpty(SequentialStackChar *s) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
-        return 1;
+        return SUCCEEDED;
     }
     else {
-        return 0;
+        return FAILED;
     }
 }
 
-/*  If the stack is NOT full, push e into it and return 1 to indicate a successful push.
-    If the stack is full, merely return 0 to indicate an unsuccessful push.
+/*  If the stack is NOT full, push e into it and return SUCCEEDED to indicate a successful push.
+ *  If the stack is full, merely return FAILED to indicate an unsuccessful push.
  */
-int Push(SqStack *s, ElemType e) {
+State Push(SequentialStackChar *s, ElemType e) {
     CHECKPOINTER(s);
     if (StackLen(s) >= MaxSize) {
         /* stack is full */
         printf("The stack is FULL.\n");
-        return 0;
+        return FAILED;
     }
     else {
         /* stack is not full */
         s->top++;
         s->data[s->top] = e;
-        return 1;
+        return SUCCEEDED;
     }
 }
 
-/*  If the stack is NOT empty, pop the top of the stack into e and return 1 to indicate a successful pop.
-    If the stack is empty, merely return 0 to indicate an unsuccessful pop.
+/*  If the stack is NOT empty, pop the top of the stack into e and return SUCCEEDED to indicate a successful pop.
+ *  If the stack is empty, merely return FAILED to indicate an unsuccessful pop.
  */
-int Pop(SqStack *s, ElemType *e) {
+State Pop(SequentialStackChar *s, ElemType *e) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
         /* stack is empty */
         printf("The stack is empty.\n");
-        return 0;
+        return FAILED;
     }
     else {
         /* stack is NOT empty */
         *e = s->data[s->top];
         s->top--;
-        return 1;
+        return SUCCEEDED;
     }
 }
 
-/*  If the stack is NOT empty, assign the top of the stack to e and return 1 to indicate a successful gettop.
-    If the stack is empty, merely return 0 to indicate an unsuccessful gettop.
+/*  If the stack is NOT empty, assign the top of the stack to e and return SUCCEEDED to indicate a successful gettop.
+ *   If the stack is empty, merely return FAILED to indicate an unsuccessful gettop.
  */
-int GetTop(SqStack *s, ElemType *e) {
+State GetTop(SequentialStackChar *s, ElemType *e) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
         /* stack is empty */
-        return 0;
+        return FAILED;
     }
     else {
         /* stack is NOT empty */
         *e = s->data[s->top];
-        return 1;
+        return SUCCEEDED;
     }
-}
-
-void display(SqStack *s) {
-    CHECKPOINTERVOID(s);
-    int cur_len = StackLen(s);
-    for (int i=0; i<cur_len; ++i) {
-        printf("%c\t", s->data[i]);
-    }
-    printf("\n");
 }
 
 /* Interfaces for the 2nd stack for double elements*/
 
 /*  Initialize the sequential stack
  */
-void InitStack1(SqStack1 *s) {
-    CHECKPOINTERVOID(s);
+State InitStackDouble(SequentialStackDouble *s) {
+    CHECKPOINTER(s);
     s->top = -1;
+    return SUCCEEDED;
 }
 
 /*  Release the memory of the sequential stack
  */
-void DestroyStack1(SqStack1 *s) {
+void DestroyStackDouble(SequentialStackDouble *s) {
     CHECKPOINTERVOID(s);
     free(s);
 }
 
-/*  Check if the stack is empty.
- Return 1 to indicate the stack is empty.
- Return 0 to indicate the stack is NOT empty.
+/* Check if the stack is empty.
+ * Return SUCCEEDED to indicate the stack is empty.
+ * Return FAILED to indicate the stack is NOT empty.
  */
-int StackEmpty1(SqStack1 *s) {
+State StackEmptyDouble(SequentialStackDouble *s) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
-        return 1;
+        return SUCCEEDED;
     }
     else {
-        return 0;
+        return FAILED;
     }
 }
 
-/*  If the stack is NOT full, push e into it and return 1 to indicate a successful push.
-    If the stack is full, merely return 0 to indicate an unsuccessful push.
+/* If the stack is NOT full, push e into it and return SUCCEEDED to indicate a successful push.
+ * If the stack is full, merely return FAILED to indicate an unsuccessful push.
  */
-int Push1(SqStack1 *s, ElemType1 e) {
+State PushDouble(SequentialStackDouble *s, ElemTypeDouble e) {
     CHECKPOINTER(s);
     if (StackLen(s) >= MaxSize) {
         /* stack is full */
         printf("The stack is FULL.\n");
-        return 0;
+        return FAILED;
     }
     else {
         /* stack is not full */
         s->top++;
         s->data[s->top] = e;
-        return 1;
+        return SUCCEEDED;
     }
 }
 
-/*  If the stack is NOT empty, pop the top of the stack into e and return 1 to indicate a successful pop.
-    If the stack is empty, merely return 0 to indicate an unsuccessful pop.
+/* If the stack is NOT empty, pop the top of the stack into e and return SUCCEEDED to indicate a successful pop.
+ * If the stack is empty, merely return FAILED to indicate an unsuccessful pop.
  */
-int Pop1(SqStack1 *s,ElemType1 *e) {
+State PopDouble(SequentialStackDouble *s,ElemTypeDouble *e) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
         /* stack is empty */
         printf("The stack is empty.\n");
-        return 0;
+        return FAILED;
     }
     else {
         /* stack is NOT empty */
         *e = s->data[s->top];
         s->top--;
-        return 1;
+        return SUCCEEDED;
     }
 }
 
-/*  If the stack is NOT empty, assign the top of the stack to e and return 1 to indicate a successful gettop.
-    If the stack is empty, merely return 0 to indicate an unsuccessful gettop.
+/* If the stack is NOT empty, assign the top of the stack to e and return SUCCEEDED to indicate a successful gettop.
+ * If the stack is empty, merely return FAILED to indicate an unsuccessful gettop.
  */
-int GetTop1(SqStack1 *s,ElemType1 *e) {
+State GetTopDouble(SequentialStackDouble *s,ElemTypeDouble *e) {
     CHECKPOINTER(s);
     if (StackLen(s) <= 0) {
         /* stack is empty */
-        return 0;
+        return FAILED;
     }
     else {
         /* stack is NOT empty */
         *e = s->data[s->top];
-        return 1;
+        return SUCCEEDED;
     }
 }

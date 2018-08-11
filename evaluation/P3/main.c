@@ -288,9 +288,9 @@ int main(int argc, const char * argv[]) {
     for (int i = 0; i < properTestNumbers; i++) {
         printf("---------------------***   Test %d    ***------------------------\n\n", i + 1);
         printf("The infix expression:%s\n", properInfixExpressions[i]);
-        if (infixToPostfix(properInfixExpressions[i], postfixExpression) == 1){
+        if (infixToPostfix(properInfixExpressions[i], postfixExpression) == SUCCEEDED){
             printf("The postfix expression:%s\n", postfixExpression);
-            if (computeValueFromPostfix(postfixExpression, &value) == 1)
+            if (computeValueFromPostfix(postfixExpression, &value) == SUCCEEDED)
                 printf("The value of the expression:%g\n\n", value);
             else
                 printf("Sorry, we can't evaluate such a postfix expression.");
@@ -307,9 +307,9 @@ int main(int argc, const char * argv[]) {
         
         printf("---------------------***   Test %d    ***------------------------\n\n", i + 1);
         printf("The infix expression:%s\n", improperInfixExpressions[i]);
-        if (infixToPostfix(improperInfixExpressions[i], postfixExpression) == 1){
+        if (infixToPostfix(improperInfixExpressions[i], postfixExpression) == SUCCEEDED){
             printf("The postfix expression:%s\n", postfixExpression);
-            if (computeValueFromPostfix(postfixExpression, &value) == 1)
+            if (computeValueFromPostfix(postfixExpression, &value) == SUCCEEDED)
                 printf("The value of the expression:%g\n\n", value);
             else
                 printf("Sorry, we can't evaluate such a postfix expression.\n");
@@ -325,9 +325,9 @@ int main(int argc, const char * argv[]) {
     for (int i = 0; i < newProperTestNumbers; i++) {
         printf("---------------------***   Test %d    ***------------------------\n\n", i + 1);
         printf("The infix expression:%s\n", newProperInfixExpressions[i]);
-        if (infixToPostfix(newProperInfixExpressions[i], postfixExpression) == 1){
+        if (infixToPostfix(newProperInfixExpressions[i], postfixExpression) == SUCCEEDED){
             printf("The postfix expression:%s\n", postfixExpression);
-            if (computeValueFromPostfix(postfixExpression, &value) == 1)
+            if (computeValueFromPostfix(postfixExpression, &value) == SUCCEEDED)
                 printf("The value of the expression:%g\n\n", value);
             else
                 printf("Sorry, we can't evaluate such a postfix expression.");
@@ -344,9 +344,9 @@ int main(int argc, const char * argv[]) {
         
         printf("---------------------***   Test %d    ***------------------------\n\n", i + 1);
         printf("The infix expression:%s\n", newImproperInfixExpressions[i]);
-        if (infixToPostfix(newImproperInfixExpressions[i], postfixExpression) == 1){
+        if (infixToPostfix(newImproperInfixExpressions[i], postfixExpression) == SUCCEEDED){
             printf("The postfix expression:%s\n", postfixExpression);
-            if (computeValueFromPostfix(postfixExpression, &value) == 1)
+            if (computeValueFromPostfix(postfixExpression, &value) == SUCCEEDED)
                 printf("The value of the expression:%g\n\n", value);
             else
                 printf("Sorry, we can't evaluate such a postfix expression.\n");
@@ -357,6 +357,7 @@ int main(int argc, const char * argv[]) {
         printf("----------------------------------------------------------------\n\n");
     }
     printf("-----***   End of tests for NEW IMPROPER prefix expressions.    ***-----\n\n\n");
+    
     return 0;
 }
 

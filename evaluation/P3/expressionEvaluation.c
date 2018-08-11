@@ -14,8 +14,8 @@
     stack = NULL; \
 } while(0);
 
-#define DESTROYSTACK1(stack) do { \
-    DestroyStack1(stack); \
+#define DESTROYSTACKDOUBLE(stack) do { \
+    DestroyStackDouble(stack); \
     stack = NULL; \
 } while(0);
 
@@ -27,10 +27,10 @@
     } \
 } while(0);
 
-#define PUSH1(STACK, ELEM) do { \
-    if (!Push1(STACK, ELEM)) { \
-        printf("err! Push1 failed \n"); \
-        DESTROYSTACK1(STACK); \
+#define PUSHDOUBLE(STACK, ELEM) do { \
+    if (!PushDouble(STACK, ELEM)) { \
+        printf("err! PUSHDOUBLE failed \n"); \
+        DESTROYSTACKDOUBLE(STACK); \
         return 0; \
     } \
 } while(0);
@@ -42,33 +42,34 @@ int priority(char c);
 /*
  * return the character before s[position - step]
  * if position == 0, return '\0'
- */
+ * */
 char getpriorCH(char *s, int position, int step);
+/* Convert a unary operator to a binary operator */
 char U2B(char unary);
+/* Convert a binary operator to a unary operator */
 char B2U(char binary);
 /*
  * This function will check whether the character is legal , 
  * filter out the spaces, and identify different elements,
  * such as operands, binary operators, unary operators, etc. 
  * If everything is all right, RETURN 1; otherwise, RETURN 0 
-*/ 
+ * */ 
 int expressionFilter(char *infixExpression);
 
-int infixToPostfix(char *infixExpression,char postfixExpression[]) {
-    if (!expressionFilter(infixExpression)) {
-        // printf("err! expression filter failed. \n");
-        return 0;
-    }
-    SqStack *sk = (SqStack *)malloc(sizeof(SqStack));
+State infixToPostfix(char *infixExpression,char postfixExpression[]) {
+    /* verificate the infixExpression */
+    if (!expressionFilter(infixExpression)) { return 0; }
+ 
+    SequentialStackChar *sk = (SequentialStackChar *)malloc(sizeof(SequentialStackChar));
     InitStack(sk);
 
     char topch;
     int index = 0;
-    // There is no need to do the legitimacy checking, 
-    // because it has been done in the expressionFilter function
+    /* There is no need to do the legitimacy checking,          */
+    /* because it has been done in the expressionFilter function*/ 
     while (*infixExpression != '\0') {
-        topch = '\0';  // refresh the value of topch
-        // append the operands to the postfixExpression immediately
+        topch = '\0';  /* refresh the value of topch */
+        /* append the operands to the postfixExpression immediately */
         if (isdigit(*infixExpression)) {
             while (isdigit(*infixExpression)) {
                 postfixExpression[index++] = *infixExpression;
@@ -76,9 +77,8 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
             }
             postfixExpression[index++] = '_';
         }
-        // pop out the element until the top of the stack is '('
+        /* pop out the element until the top of the stack is '(' */
         else if (')' == *infixExpression) {
-            // priortype = BRACES;
             while (!StackEmpty(sk)) {
                 if (!Pop(sk, &topch)) {
                     printf("err! Pop failed. \n");
@@ -96,12 +96,12 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
             }
             ++infixExpression;
         }
-        // push the '(' into the stack immediately
+        /* push the '(' into the stack immediately */
         else if ('(' == *infixExpression) {
             PUSH(sk, *infixExpression);
             ++infixExpression;
         }
-        // process the operators
+        /* process the operators */
         else if (isBinaryOperator(*infixExpression) || isUnaryOperator(*infixExpression)) {
             if (StackEmpty(sk)) {
                 PUSH(sk, *infixExpression);
@@ -128,7 +128,7 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
             }
             ++infixExpression;
         }
-        // spaces
+        /* spaces */
         else {
             ++infixExpression;
         }
@@ -156,13 +156,13 @@ int infixToPostfix(char *infixExpression,char postfixExpression[]) {
     return 0;
 }
 
-int computeValueFromPostfix(char *postfixExpression, double *value) {
-    SqStack1 *sk = (SqStack1 *)malloc(sizeof(SqStack1));
+State computeValueFromPostfix(char *postfixExpression, double *value) {
+    SequentialStackDouble *sk = (SequentialStackDouble *)malloc(sizeof(SequentialStackDouble));
     if (NULL == sk) {
         printf("err! Memory allocation failed! \n");
         return 0;
     }
-    InitStack1(sk);
+    InitStackDouble(sk);
     double a,b;
     double res;
     while (*postfixExpression != '\0') {
@@ -172,10 +172,10 @@ int computeValueFromPostfix(char *postfixExpression, double *value) {
                 sum = sum * 10 + *postfixExpression - '0';
                 ++postfixExpression;
             }
-            PUSH1(sk, sum);
+            PUSHDOUBLE(sk, sum);
         }
         else if (isBinaryOperator(*postfixExpression)){
-            if (!Pop1(sk, &b) || !Pop1(sk, &a)) {
+            if (!PopDouble(sk, &b) || !PopDouble(sk, &a)) {
                 printf("ERROR occured when popping the operands. \n");
                 return 0;
             }
@@ -199,11 +199,11 @@ int computeValueFromPostfix(char *postfixExpression, double *value) {
                 default:
                     res = 1;
             }
-            PUSH1(sk, res);
+            PUSHDOUBLE(sk, res);
             ++postfixExpression;
         }
         else if (isUnaryOperator(*postfixExpression)) {
-            if (!Pop1(sk, &a)) {
+            if (!PopDouble(sk, &a)) {
                 printf("ERROR occured when popping the operands. \n");
                 return 0;
             }
@@ -217,23 +217,23 @@ int computeValueFromPostfix(char *postfixExpression, double *value) {
                 default:
                     res = 1;
             }
-            PUSH1(sk, res);
+            PUSHDOUBLE(sk, res);
             ++postfixExpression;
         }
         else {
             ++postfixExpression;
         }
     }
-    if (!StackEmpty1(sk)) {
-        if (!GetTop1(sk, value)) {
+    if (!StackEmptyDouble(sk)) {
+        if (!GetTopDouble(sk, value)) {
             printf("ERROR occured when getting the top of the stack. \n");
             return 0;
         }
-        DESTROYSTACK1(sk);
+        DESTROYSTACKDOUBLE(sk);
         return 1;
     }
     printf("err! Calculation failed. \n");
-    DESTROYSTACK1(sk);
+    DESTROYSTACKDOUBLE(sk);
     return 0;
 }
 
@@ -269,7 +269,7 @@ int priority(char c) {
     if (!isBinaryOperator(c) && !isUnaryOperator(c)) {
         printf("err! Illegal operator : %c. \n", c); 
         return 0;
-    }   
+    }
     int ret = 0;
     switch(c) {
         case '+':
@@ -340,7 +340,8 @@ int expressionFilter(char *s) {
             return 0;
         }
         if (isdigit(s[i])) {  
-            /* forward traversal, the prior char (which is not a space) and the judgement are as follow
+            /* forward traversal, the prior character (which is not a space) 
+             * and the judgement are as follow:
              * digit : right
              * digit+space : wrong
              * '(' : right
@@ -369,7 +370,7 @@ int expressionFilter(char *s) {
             spacesNum = 0;
         }
         else if (isBinaryOperator(s[i])) {
-            /* forward traversal, the prior char and the judgement are as follow
+            /* forward traversal, the prior character and the judgement are as follow
              * digit : right
              * '(' : +/- discriminate as an unary operator; while * and / is wrong
              * ')' : right
@@ -377,17 +378,18 @@ int expressionFilter(char *s) {
              * discriminate unary operator
             */
 
-            // Both the binary operator and the unary operator are not allowed to locate in the last position
+            /* Both the binary operator and the unary operator */
+            /* are not allowed to locate in the last position  */
             if (i >= len-1) {
                 printf("err! No operand after the last operator '%c' in the expression. \n", s[i]);
                 return 0;
             }
             priorCH = getpriorCH(s, i, spacesNum);
-            // Unary operator
+            /* Unary operator */
             if ( '-' == s[i] || '+' == s[i]) {
                 if ( '\0' == priorCH || '(' == priorCH ) {
                     s[i] = B2U(s[i]);
-                    // s[i] is an unary operator
+                    /* s[i] is an unary operator */
                 }
             }
             if (isBinaryOperator(s[i])) {
@@ -411,8 +413,8 @@ int expressionFilter(char *s) {
             tmp[itr++] = s[i];
             spacesNum = 0;
         }
-        else if ('(' == s[i]) { // ) digit ( )
-            /* forward traversal, the prior char and the judgement are as follow
+        else if ('(' == s[i]) {
+            /* forward traversal, the prior character and the judgement are as follow
              * spaces : pass and spacesNum++
              * digit : wrong
              * '(' : right
@@ -439,14 +441,14 @@ int expressionFilter(char *s) {
             spacesNum = 0;
         }
         else if (')' == s[i]) {
-            /* forward traversal, the prior char and the judgement are as follow
+            /* forward traversal, the prior character and the judgement are as follow
              * spaces : pass and spacesNum++
              * digit : right
              * '(' : wrong
              * ')' : right
              * operator : wrong
              * '\0' : wrong
-            */
+             * */
             priorCH = getpriorCH(s, i, spacesNum);
             if ('(' == priorCH) {
                 printf("err! No operand between '(' and ')'. \n");
@@ -468,12 +470,12 @@ int expressionFilter(char *s) {
             spacesNum = 0;
         }
         else {  
-            // isspaces(s[i])
-            // The counter spacesNum will be reset when s[i] is not a space 
+            /* isspaces(s[i]) */
+            /* The counter spacesNum will be reset when s[i] is not a space. */  
             ++spacesNum;
         }
     }
-    // priorCH is the last character that is not a space
+    /* priorCH is the last character that is not a space */
     priorCH = getpriorCH(s, len, spacesNum);
     if (isBinaryOperator(priorCH)) {
         printf("err! No operand after the last operator '%c' in the expression. \n", priorCH);
