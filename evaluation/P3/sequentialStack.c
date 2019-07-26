@@ -14,14 +14,14 @@
         printf("err! illegal parameter, the pointer is NULL.\n"); \
         return ; \
     } \
-} while(0);
+} while(0)
 /* test of validity */
 #define CHECKPOINTER(pointer) do { \
     if (NULL==pointer) {\
         printf("err! illegal parameter, the pointer is NULL.\n"); \
         return FAILED; \
     } \
-} while(0);
+} while(0)
 
 State InitStack(SequentialStackChar *s) {
     CHECKPOINTER(s);
